@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/google/go-github/v62/github"
+	"github.com/google/go-github/v79/github"
 	"golang.org/x/oauth2"
 
 	"github.com/yourname/go-trendboard/internal/config"

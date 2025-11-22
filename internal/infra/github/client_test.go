@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/go-github/v62/github"
+	"github.com/google/go-github/v79/github"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -48,9 +48,10 @@ func TestClient_FetchStars(t *testing.T) {
 		t.Parallel()
 		client, mux := setupTestClient(t, nil)
 		repoName := "owner/repo"
-		        expectedStars := 1234
-		
-				mux.HandleFunc(fmt.Sprintf("/api/v3/repos/%s", repoName), func(w http.ResponseWriter, r *http.Request) {			require.Equal(t, http.MethodGet, r.Method)
+		expectedStars := 1234
+
+		mux.HandleFunc(fmt.Sprintf("/api/v3/repos/%s", repoName), func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodGet, r.Method)
 			w.Header().Set("Content-Type", "application/json")
 			fmt.Fprintf(w, `{"stargazers_count": %d}`, expectedStars)
 		})
