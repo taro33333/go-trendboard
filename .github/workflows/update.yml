@@ -1,0 +1,58 @@
+# .github/workflows/update.yml
+name: Update Go Trend Dashboard
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  schedule:
+    # Runs every day at 00:00 UTC
+    - cron: '0 0 * * *'
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25'
+
+      - name: Adjust go.mod for fork
+        if: github.repository != 'yourname/go-trendboard'
+        run: |
+          go mod edit -module github.com/${{ github.repository }}
+          go mod tidy
+        shell: bash
+
+      - name: Run go-trendboard update
+        run: go run ./cmd/trendboard update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run go-trendboard generate
+        run: go run ./cmd/trendboard generate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Also needed for config load
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # Add generated files. The -f flag forces adding otherwise ignored files (like /data)
+          git add -f data/*.json dashboard.md repos.json
+
+          # Commit if there are changes
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update trend data and dashboard [${{ env.TODAY }}]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+        env:
+          TODAY: $(date -u +'%Y-%m-%d')

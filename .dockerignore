@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Go modules
+go.mod
+go.sum
+vendor/
+
+# Local data and artifacts
+data/
+dashboard.*
+repos.json
+go-trendboard
+
+# IDE settings
+.idea/
+.vscode/
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Environment
+.env
